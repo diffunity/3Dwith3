@@ -10,6 +10,7 @@ public class Rocket2 : Agent
     private Transform tr;
     private Rigidbody rb;
     public Transform targetTr;
+    public Collider targetCollider;
     public Transform deadZone;
     public Renderer floorRd;
     public Collider launchPad;
@@ -41,6 +42,20 @@ public class Rocket2 : Agent
     public override void OnEpisodeBegin()
     {
         // the beginning setting of each episodes
+        // var capsuleCollider = targetCollider.GetComponent("CapsuleCollider") as CapsuleCollider;
+
+        // Curriculum Phase 1
+        // capsuleCollider.radius = 100;
+        // capsuleCollider.height = 100;
+        
+        // Curriculum Phase 2
+        // capsuleCollider.radius = 70;
+        // capsuleCollider.height = 70;
+
+        // Curriculum Phase 3
+        // capsuleCollider.radius = 40;
+        // capsuleCollider.height = 40;
+
 
         timer = 0;
         tr.localPosition = new Vector3(418.5815f, -1.4f, -58.23349f);
@@ -59,6 +74,10 @@ public class Rocket2 : Agent
         float targetX = 418.5815f + Random.Range(-200.0f, 200.0f);
         float targetZ = -58.23349f + Random.Range(-200.0f, 200.0f);
         float targetY = 500f + Random.Range(0.0f, 20.0f);
+
+        // float targetX = 10.02007f;
+        // float targetY = 476.0389f;
+        // float targetZ = 629.3224f;
 
         targetTr.localPosition = new Vector3(targetX,
                                              targetY,
@@ -174,7 +193,8 @@ public class Rocket2 : Agent
 
         if(other.tag=="Target")
         {
-            AddReward(-1.0f);
+            Debug.Log("TARGET REACHED!!!!!!!!");
+            AddReward(+5.0f);
             EndEpisode();
         }
     }

@@ -3506,11 +3506,10 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   targetTr: {fileID: 3625186180352184794}
+  targetCollider: {fileID: 7482297231438203087}
   deadZone: {fileID: 1068864491}
   floorRd: {fileID: 785857196}
   launchPad: {fileID: 544294531637595455}
-  badMt: {fileID: 0}
-  goodMt: {fileID: 0}
 --- !u!114 &1995953108
 MonoBehaviour:
   m_ObjectHideFlags: 0
