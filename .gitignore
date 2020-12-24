@@ -60,3 +60,7 @@ crashlytics-build.properties
 
 
 ml-agents
+*ipynb*
+firstbuild*
+*.so
+*.debug

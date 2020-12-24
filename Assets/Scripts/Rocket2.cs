@@ -10,14 +10,18 @@ public class Rocket2 : Agent
 	private Transform tr;
 	private Rigidbody rb;
 	public Transform targetTr;
+    public Transform deadZone;
 	public Renderer floorRd;
+    public Collider launchPad;
 
 	private Material originMt;
 	public Material badMt;
 	public Material goodMt;
 
 	private float timer = 0.0f;
-	private float waitTime = 70.0f;
+	private float waitTime = 10.0f;
+
+    private float distanceLimit = 1000.0f;
 
 	private float velX = 0.0f;
 	private float velZ = 0.0f;
@@ -39,10 +43,20 @@ public class Rocket2 : Agent
 
     public override void OnEpisodeBegin()
     {
+        // the beginning setting of each episodes
+
         timer = 0;
-    	tr.localPosition = new Vector3(418.5815f, -1.367086f, -58.23349f);
-    	// Debug.Log($"agent y-position = [{tr.localPosition.y}]");
-    	// the beginning setting of each episodes
+    	tr.localPosition = new Vector3(418.5815f, -1.0f, -58.23349f);
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        velX = 0.0f;
+        velZ = 0.0f;
+        upwardsThrust = 0.0f;
+
+        Debug.Log($"velocity and angular velocity = {rb.velocity} {rb.angularVelocity}");
+        Debug.Log($"Initial y position tr={tr.localPosition.y}");
+    	
 
     	float targetX = 418.5815f + Random.Range(-200.0f, 200.0f);
     	float targetZ = -58.23349f + Random.Range(-200.0f, 200.0f);
@@ -52,7 +66,6 @@ public class Rocket2 : Agent
         									 targetY,
         									 targetZ);
 
-    	// StartCoroutine(TimeChecker());
     }
 
     public override void CollectObservations(Unity.MLAgents.Sensors.VectorSensor sensor)
@@ -67,42 +80,50 @@ public class Rocket2 : Agent
         sensor.AddObservation(rb.angularVelocity.z); // 1
         sensor.AddObservation(timer); // 1
 
-        // Debug.Log($"tr location = {tr.localPosition}");
-
         // total = 9
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
+        Debug.Log($"Initial y position tr={tr.localPosition.y}");
         var continuousActions = actionBuffers.ContinuousActions;
 
         timer += Time.deltaTime;
-        
+        if(timer > 5.0f){
+            launchPad.isTrigger = true;
+        }
         if(timer > waitTime){
             Debug.Log($"Time={timer}");
             Debug.Log($"End Episode");
             timer = 0;
             EndEpisode();
         }
+
+        var distance = Vector3.Distance(deadZone.localPosition, tr.localPosition);
+        
+        if(distance > distanceLimit){
+            Debug.Log($"Rocket Out of Distance Limit. End Episode");
+            AddReward(-1.0f);
+            EndEpisode();
+        }
+
+        if(tr.localPosition.y < -1.3f){
+            Debug.Log($"Position below initial Y");
+            AddReward(-1.0f);
+            EndEpisode();   
+        }
         
         upwardsThrust += continuousActions[2] * 1;
-        upwardsThrust -= continuousActions[3] * 1;
+        // upwardsThrust -= continuousActions[3] * 1;
 
         velX = Mathf.Clamp(continuousActions[0], -1.0f, 1.0f);
         velZ = Mathf.Clamp(continuousActions[1], -1.0f, 1.0f);
-        Debug.Log($"Vector Action = {actionBuffers.ContinuousActions}");
 
         if(continuousActions[0] > 0.0f){
             Debug.Log($"Vector Action 0 = {continuousActions[0]}");
             Debug.Log($"Vector Action 1 = {continuousActions[1]}");
             Debug.Log($"Vector Action 2 = {continuousActions[2]}");
         }
-        
-
-
-        // Debug.Log($"Thrust = {rb.velocity.y}");
-        // Debug.Log($"[velX]={velX} [velZ]={velZ} [upwardsThrust]={upwardsThrust}");
-
 
         rb.AddRelativeTorque(velX*0.1f,
                              0.0f,
@@ -113,6 +134,7 @@ public class Rocket2 : Agent
                             0.0f);
 
         AddReward(-0.001f);
+
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -121,24 +143,14 @@ public class Rocket2 : Agent
         continuousActionsOut[0] = Input.GetAxis("Horizontal"); // 상하 키
         continuousActionsOut[1] = Input.GetAxis("Vertical"); // 좌우 키
         continuousActionsOut[2] = Input.GetAxis("Fire1");  // left ctrl
-        continuousActionsOut[3] = Input.GetAxis("Fire2");  // left alt
+        // continuousActionsOut[3] = Input.GetAxis("Fire2");  // left alt
 
-        Debug.Log($"[0]={continuousActionsOut[0]} [1]={continuousActionsOut[1]} [2]={continuousActionsOut[2]} [3]={continuousActionsOut[3]}");
+        // Debug.Log($"[0]={continuousActionsOut[0]} [1]={continuousActionsOut[1]} [2]={continuousActionsOut[2]} [3]={continuousActionsOut[3]}");
     }
 
 
     void OnCollisionEnter(Collision coll)
     {
-
-        Debug.Log($"Dead Zone Collision = {coll.collider.CompareTag("Dead_Zone")}");
-    	if(coll.collider.CompareTag("Dead_Zone"))
-    	{
-
-    		AddReward(-1.0f);
-
-    		EndEpisode();
-
-    	}
 
     	if(coll.collider.CompareTag("Target"))
     	{
@@ -148,18 +160,37 @@ public class Rocket2 : Agent
     		EndEpisode();
 
     	}
+
+        if(coll.collider.CompareTag("LaunchPosition"))
+        {
+
+            AddReward(-1.0f);
+
+            EndEpisode();
+        }
     }
 
-    IEnumerator TimeChecker()
+    void OnTriggerEnter(Collider other)
     {
-    	yield return new WaitForSeconds(1.0f);
-    	AddReward(-0.001f);
-        Debug.Log($"Time={timer}");
-    	if (timer > waitTime){
-    		EndEpisode();
-    	}
+        if(other.tag=="LaunchPosition"){
+            AddReward(-1.0f);
+            EndEpisode();
+        }
     }
 
+    // IEnumerator TimeChecker()
+    // {
+    // 	yield return new WaitForSeconds(1.0f);
+    // 	AddReward(-0.001f);
+    //     Debug.Log($"Time={timer}");
+    // 	if (timer > waitTime){
+    // 		EndEpisode();
+    // 	}
+    // }
+
+    private void FixedUpdate(){
+
+    }
 
     // Update is called once per frame
     void Update()
