@@ -14,9 +14,9 @@ public class Rocket2 : Agent
     public Renderer floorRd;
     public Collider launchPad;
 
-    private Material originMt;
-    public Material badMt;
-    public Material goodMt;
+    // private Material originMt;
+    // public Material badMt;
+    // public Material goodMt;
 
     private float timer = 0.0f;
     private float waitTime = 10.0f;
@@ -29,16 +29,13 @@ public class Rocket2 : Agent
     private float upwardsThrust = 0.0f;
 
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    void Start(){}
 
     public override void Initialize()
     {
         tr = GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
-        originMt = floorRd.material;
+        // originMt = floorRd.material;
     }
 
     public override void OnEpisodeBegin()
@@ -73,7 +70,6 @@ public class Rocket2 : Agent
     {
 
         // observation settings
-
         sensor.AddObservation(targetTr.localPosition); // 3
         sensor.AddObservation(tr.localPosition); // 3
         sensor.AddObservation(rb.velocity.y); // 1
@@ -91,10 +87,12 @@ public class Rocket2 : Agent
 
         timer += Time.deltaTime;
         if(timer > 2.0f){
+            Debug.Log("Launch Pad isTrigger on");
             launchPad.isTrigger = true;
         }
+
         if(timer > waitTime){
-            Debug.Log($"Time={timer}");
+            Debug.Log($"Out of Time Limit {timer}");
             Debug.Log($"End Episode");
             timer = 0;
             EndEpisode();
@@ -155,88 +153,34 @@ public class Rocket2 : Agent
 
         if(coll.collider.CompareTag("Target"))
         {
-
             AddReward(+5.0f);
-
             EndEpisode();
-
         }
 
         if(coll.collider.CompareTag("LaunchPosition"))
         {
-
             AddReward(-1.0f);
-
             EndEpisode();
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.tag=="LaunchPosition"){
+        if(other.tag=="LaunchPosition")
+        {
             AddReward(-1.0f);
             EndEpisode();
         }
 
-        if(other.tag=="Target"){
+        if(other.tag=="Target")
+        {
             AddReward(-1.0f);
             EndEpisode();
         }
     }
 
-    // IEnumerator TimeChecker()
-    // {
-    //     yield return new WaitForSeconds(1.0f);
-    //     AddReward(-0.001f);
-    //     Debug.Log($"Time={timer}");
-    //     if (timer > waitTime){
-    //         EndEpisode();
-    //     }
-    // }
-
-    private void FixedUpdate(){
-
-    }
+    private void FixedUpdate(){}
 
     // Update is called once per frame
-    void Update()
-    {
-        // this is not used in the training environment
-
-        // float turnX = Input.GetAxis("Horizontal"); // 상하 키
-        // float turnZ = Input.GetAxis("Vertical"); // 좌우 키
-        // float turnY = Input.GetAxis("Fire1"); // left ctrl
-
-        // velX += turnX * 1;
-        // velZ += turnZ * 1;
-        // velY += turnY * 1;
-
-        // float currentAngularVelX = rb.angularVelocity.x;
-        // float currentAngularVelZ = rb.angularVelocity.z;
-        // float currentVelY = rb.velocity.y;
-        // timer += Time.deltaTime;
-        // Debug.Log($"Time={timer}");
-
-        // Debug.Log($"Thrust = {currentVelY}");
-        // Debug.Log($"[velX] = {velX} [velZ] = {velZ} [velY]= {velY}");
-
-        // rb.AddRelativeTorque(velX*0.1f,
-                    //          0.0f,
-                    //          velZ*0.1f);
-        
-        // rb.AddRelativeForce(0.0f, 
-        //                     velY * 11, 
-        //                     0.0f);
-
-        // rb.AddForce(0.0f,
-        //             currentVelY + velY * 11,
-        //             0.0f);
-        // if(Time.deltaTime % 20 == 1){
-
-        //     Debug.Log($"Time={Time.deltaTime}");
-        //     velX = 0;
-        //     velY = 0;
-        //     velZ = 0;
-        // }
-    }
+    void Update(){}
 }
