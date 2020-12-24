@@ -7,24 +7,24 @@ using System.Collections.Generic;
 
 public class Rocket2 : Agent
 {
-	private Transform tr;
-	private Rigidbody rb;
-	public Transform targetTr;
+    private Transform tr;
+    private Rigidbody rb;
+    public Transform targetTr;
     public Transform deadZone;
-	public Renderer floorRd;
+    public Renderer floorRd;
     public Collider launchPad;
 
-	private Material originMt;
-	public Material badMt;
-	public Material goodMt;
+    private Material originMt;
+    public Material badMt;
+    public Material goodMt;
 
-	private float timer = 0.0f;
-	private float waitTime = 10.0f;
+    private float timer = 0.0f;
+    private float waitTime = 10.0f;
 
     private float distanceLimit = 1000.0f;
 
-	private float velX = 0.0f;
-	private float velZ = 0.0f;
+    private float velX = 0.0f;
+    private float velZ = 0.0f;
 
     private float upwardsThrust = 0.0f;
 
@@ -36,9 +36,9 @@ public class Rocket2 : Agent
 
     public override void Initialize()
     {
-    	tr = GetComponent<Transform>();
-    	rb = GetComponent<Rigidbody>();
-    	originMt = floorRd.material;
+        tr = GetComponent<Transform>();
+        rb = GetComponent<Rigidbody>();
+        originMt = floorRd.material;
     }
 
     public override void OnEpisodeBegin()
@@ -46,7 +46,8 @@ public class Rocket2 : Agent
         // the beginning setting of each episodes
 
         timer = 0;
-    	tr.localPosition = new Vector3(418.5815f, -1.4f, -58.23349f);
+        tr.localPosition = new Vector3(418.5815f, -1.4f, -58.23349f);
+        tr.localRotation = Quaternion.Euler(0,-45,0);
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
@@ -56,26 +57,26 @@ public class Rocket2 : Agent
 
         Debug.Log($"velocity and angular velocity = {rb.velocity} {rb.angularVelocity}");
         Debug.Log($"Initial y position tr={tr.localPosition.y}");
-    	
+        
 
-    	float targetX = 418.5815f + Random.Range(-200.0f, 200.0f);
-    	float targetZ = -58.23349f + Random.Range(-200.0f, 200.0f);
-    	float targetY = 500f + Random.Range(0.0f, 20.0f);
+        float targetX = 418.5815f + Random.Range(-200.0f, 200.0f);
+        float targetZ = -58.23349f + Random.Range(-200.0f, 200.0f);
+        float targetY = 500f + Random.Range(0.0f, 20.0f);
 
-    	targetTr.localPosition = new Vector3(targetX,
-        									 targetY,
-        									 targetZ);
+        targetTr.localPosition = new Vector3(targetX,
+                                             targetY,
+                                             targetZ);
 
     }
 
     public override void CollectObservations(Unity.MLAgents.Sensors.VectorSensor sensor)
     {
 
-    	// observation settings
+        // observation settings
 
-    	sensor.AddObservation(targetTr.localPosition); // 3
-    	sensor.AddObservation(tr.localPosition); // 3
-    	sensor.AddObservation(rb.velocity.y); // 1
+        sensor.AddObservation(targetTr.localPosition); // 3
+        sensor.AddObservation(tr.localPosition); // 3
+        sensor.AddObservation(rb.velocity.y); // 1
         sensor.AddObservation(rb.angularVelocity.x); // 1
         sensor.AddObservation(rb.angularVelocity.z); // 1
         sensor.AddObservation(timer); // 1
@@ -152,14 +153,14 @@ public class Rocket2 : Agent
     void OnCollisionEnter(Collision coll)
     {
 
-    	if(coll.collider.CompareTag("Target"))
-    	{
+        if(coll.collider.CompareTag("Target"))
+        {
 
-    		AddReward(+1.0f);
+            AddReward(+5.0f);
 
-    		EndEpisode();
+            EndEpisode();
 
-    	}
+        }
 
         if(coll.collider.CompareTag("LaunchPosition"))
         {
@@ -176,16 +177,21 @@ public class Rocket2 : Agent
             AddReward(-1.0f);
             EndEpisode();
         }
+
+        if(other.tag=="Target"){
+            AddReward(-1.0f);
+            EndEpisode();
+        }
     }
 
     // IEnumerator TimeChecker()
     // {
-    // 	yield return new WaitForSeconds(1.0f);
-    // 	AddReward(-0.001f);
+    //     yield return new WaitForSeconds(1.0f);
+    //     AddReward(-0.001f);
     //     Debug.Log($"Time={timer}");
-    // 	if (timer > waitTime){
-    // 		EndEpisode();
-    // 	}
+    //     if (timer > waitTime){
+    //         EndEpisode();
+    //     }
     // }
 
     private void FixedUpdate(){
@@ -215,22 +221,22 @@ public class Rocket2 : Agent
         // Debug.Log($"[velX] = {velX} [velZ] = {velZ} [velY]= {velY}");
 
         // rb.AddRelativeTorque(velX*0.1f,
-				    //     	 0.0f,
-				    //     	 velZ*0.1f);
+                    //          0.0f,
+                    //          velZ*0.1f);
         
         // rb.AddRelativeForce(0.0f, 
-        // 					velY * 11, 
-        // 					0.0f);
+        //                     velY * 11, 
+        //                     0.0f);
 
         // rb.AddForce(0.0f,
         //             currentVelY + velY * 11,
         //             0.0f);
         // if(Time.deltaTime % 20 == 1){
 
-        // 	Debug.Log($"Time={Time.deltaTime}");
-        // 	velX = 0;
-        // 	velY = 0;
-        // 	velZ = 0;
+        //     Debug.Log($"Time={Time.deltaTime}");
+        //     velX = 0;
+        //     velY = 0;
+        //     velZ = 0;
         // }
     }
 }
