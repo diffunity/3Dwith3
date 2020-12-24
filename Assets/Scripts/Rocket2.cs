@@ -46,7 +46,7 @@ public class Rocket2 : Agent
         // the beginning setting of each episodes
 
         timer = 0;
-    	tr.localPosition = new Vector3(418.5815f, -1.0f, -58.23349f);
+    	tr.localPosition = new Vector3(418.5815f, -1.4f, -58.23349f);
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
@@ -89,7 +89,7 @@ public class Rocket2 : Agent
         var continuousActions = actionBuffers.ContinuousActions;
 
         timer += Time.deltaTime;
-        if(timer > 5.0f){
+        if(timer > 2.0f){
             launchPad.isTrigger = true;
         }
         if(timer > waitTime){
@@ -107,9 +107,9 @@ public class Rocket2 : Agent
             EndEpisode();
         }
 
-        if(tr.localPosition.y < -1.3f){
+        if(tr.localPosition.y < -1.5f){
             Debug.Log($"Position below initial Y");
-            AddReward(-1.0f);
+            AddReward(-5.0f);
             EndEpisode();   
         }
         

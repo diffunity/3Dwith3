@@ -3506,7 +3506,9 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 5000
   targetTr: {fileID: 3625186180352184794}
+  deadZone: {fileID: 1068864491}
   floorRd: {fileID: 785857196}
+  launchPad: {fileID: 544294531637595455}
   badMt: {fileID: 0}
   goodMt: {fileID: 0}
 --- !u!114 &1995953108
@@ -3525,9 +3527,9 @@ MonoBehaviour:
     VectorObservationSize: 10
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 4
+      m_NumContinuousActions: 3
       BranchSizes: 
-    VectorActionSize: 04000000
+    VectorActionSize: 03000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
@@ -15819,7 +15821,7 @@ GameObject:
   - component: {fileID: 6552029518063569199}
   m_Layer: 0
   m_Name: LaunchPad2.001
-  m_TagString: Untagged
+  m_TagString: LaunchPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19828,7 +19830,7 @@ PrefabInstance:
     - target: {fileID: 1162062966405303234, guid: 2511cc98025e241dea06c0baf248f6e1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.3670857
+      value: -1.2
       objectReference: {fileID: 0}
     - target: {fileID: 1162062966405303234, guid: 2511cc98025e241dea06c0baf248f6e1,
         type: 3}
