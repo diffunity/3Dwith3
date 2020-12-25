@@ -29,6 +29,8 @@ public class Rocket2 : Agent
 
     private float upwardsThrust = 0.0f;
 
+    public float maxSpeed = 200f;
+
     // Start is called before the first frame update
     void Start(){}
 
@@ -42,7 +44,7 @@ public class Rocket2 : Agent
     public override void OnEpisodeBegin()
     {
         // the beginning setting of each episodes
-        // var capsuleCollider = targetCollider.GetComponent("CapsuleCollider") as CapsuleCollider;
+        var capsuleCollider = targetCollider.GetComponent("CapsuleCollider") as CapsuleCollider;
 
         // Curriculum Phase 1
         // capsuleCollider.radius = 100;
@@ -53,9 +55,13 @@ public class Rocket2 : Agent
         // capsuleCollider.height = 70;
 
         // Curriculum Phase 3
+        capsuleCollider.radius = 50;
+        capsuleCollider.height = 50;
+
+
+        // Curriculum Phase 3
         // capsuleCollider.radius = 40;
         // capsuleCollider.height = 40;
-
 
         timer = 0;
         tr.localPosition = new Vector3(418.5815f, -1.4f, -58.23349f);
@@ -104,6 +110,12 @@ public class Rocket2 : Agent
         Debug.Log($"Initial y position tr={tr.localPosition.y}");
         var continuousActions = actionBuffers.ContinuousActions;
 
+
+        if (rb.velocity.magnitude > maxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
+        }
+
         timer += Time.deltaTime;
         if(timer > 2.0f){
             Debug.Log("Launch Pad isTrigger on");
@@ -114,6 +126,8 @@ public class Rocket2 : Agent
             Debug.Log($"Out of Time Limit {timer}");
             Debug.Log($"End Episode");
             timer = 0;
+            // AddReward(-10.0f);
+            SetReward(-1.0f);
             EndEpisode();
         }
 
@@ -127,7 +141,7 @@ public class Rocket2 : Agent
 
         if(tr.localPosition.y < -1.5f){
             Debug.Log($"Position below initial Y");
-            AddReward(-5.0f);
+            AddReward(-1.0f);
             EndEpisode();   
         }
         
@@ -137,15 +151,21 @@ public class Rocket2 : Agent
         velX = Mathf.Clamp(continuousActions[0], -1.0f, 1.0f);
         velZ = Mathf.Clamp(continuousActions[1], -1.0f, 1.0f);
 
-        if(continuousActions[0] > 0.0f){
-            Debug.Log($"Vector Action 0 = {continuousActions[0]}");
-            Debug.Log($"Vector Action 1 = {continuousActions[1]}");
-            Debug.Log($"Vector Action 2 = {continuousActions[2]}");
-        }
+        // if(continuousActions[0] > 0.0f){
+        //     Debug.Log($"Vector Action 0 = {continuousActions[0]}");
+        //     Debug.Log($"Vector Action 1 = {continuousActions[1]}");
+        //     Debug.Log($"Vector Action 2 = {continuousActions[2]}");
+        // }
+        Vector3 torque = new Vector3(velX*0.1f, 0.0f, velZ*0.1f);
+        Vector3 thrust = new Vector3(0, upwardsThrust*11, 0);
 
-        rb.AddRelativeTorque(velX*0.1f,
-                             0.0f,
-                             velZ*0.1f);
+        rb.AddRelativeTorque(torque.normalized);
+
+        // rb.AddRelativeForce(thrust.normalized);
+
+        // rb.AddRelativeTorque(velX*0.1f,
+        //                      0.0f,
+        //                      velZ*0.1f);
 
         rb.AddRelativeForce(0.0f, 
                             upwardsThrust * 11, 
@@ -167,26 +187,27 @@ public class Rocket2 : Agent
     }
 
 
-    void OnCollisionEnter(Collision coll)
-    {
+    // void OnCollisionEnter(Collision coll)
+    // {
 
-        if(coll.collider.CompareTag("Target"))
-        {
-            AddReward(+5.0f);
-            EndEpisode();
-        }
+    //     if(coll.collider.CompareTag("Target"))
+    //     {
+    //         AddReward(+5.0f);
+    //         EndEpisode();
+    //     }
 
-        if(coll.collider.CompareTag("LaunchPosition"))
-        {
-            AddReward(-1.0f);
-            EndEpisode();
-        }
-    }
+    //     if(coll.collider.CompareTag("LaunchPosition"))
+    //     {
+    //         AddReward(-1.0f);
+    //         EndEpisode();
+    //     }
+    // }
 
     void OnTriggerEnter(Collider other)
     {
         if(other.tag=="LaunchPosition")
         {
+            Debug.Log("Launch Position Hit");
             AddReward(-1.0f);
             EndEpisode();
         }
@@ -194,7 +215,7 @@ public class Rocket2 : Agent
         if(other.tag=="Target")
         {
             Debug.Log("TARGET REACHED!!!!!!!!");
-            AddReward(+5.0f);
+            AddReward(+1.0f);
             EndEpisode();
         }
     }
