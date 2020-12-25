@@ -64,3 +64,4 @@ ml-agents
 firstbuild*
 *.so
 *.debug
+*.onnx*

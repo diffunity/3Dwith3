@@ -58,7 +58,6 @@ public class Rocket2 : Agent
         capsuleCollider.radius = 50;
         capsuleCollider.height = 50;
 
-
         // Curriculum Phase 3
         // capsuleCollider.radius = 40;
         // capsuleCollider.height = 40;
@@ -88,7 +87,7 @@ public class Rocket2 : Agent
         targetTr.localPosition = new Vector3(targetX,
                                              targetY,
                                              targetZ);
-
+        launchPad.isTrigger = false;
     }
 
     public override void CollectObservations(Unity.MLAgents.Sensors.VectorSensor sensor)
@@ -108,6 +107,7 @@ public class Rocket2 : Agent
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         Debug.Log($"Initial y position tr={tr.localPosition.y}");
+        Debug.Log($"Time {timer}");
         var continuousActions = actionBuffers.ContinuousActions;
 
 
@@ -117,6 +117,7 @@ public class Rocket2 : Agent
         }
 
         timer += Time.deltaTime;
+
         if(timer > 2.0f){
             Debug.Log("Launch Pad isTrigger on");
             launchPad.isTrigger = true;
@@ -125,9 +126,9 @@ public class Rocket2 : Agent
         if(timer > waitTime){
             Debug.Log($"Out of Time Limit {timer}");
             Debug.Log($"End Episode");
-            timer = 0;
+
             // AddReward(-10.0f);
-            SetReward(-1.0f);
+            AddReward(-1.0f);
             EndEpisode();
         }
 
@@ -151,11 +152,6 @@ public class Rocket2 : Agent
         velX = Mathf.Clamp(continuousActions[0], -1.0f, 1.0f);
         velZ = Mathf.Clamp(continuousActions[1], -1.0f, 1.0f);
 
-        // if(continuousActions[0] > 0.0f){
-        //     Debug.Log($"Vector Action 0 = {continuousActions[0]}");
-        //     Debug.Log($"Vector Action 1 = {continuousActions[1]}");
-        //     Debug.Log($"Vector Action 2 = {continuousActions[2]}");
-        // }
         Vector3 torque = new Vector3(velX*0.1f, 0.0f, velZ*0.1f);
         Vector3 thrust = new Vector3(0, upwardsThrust*11, 0);
 
@@ -186,7 +182,6 @@ public class Rocket2 : Agent
         // Debug.Log($"[0]={continuousActionsOut[0]} [1]={continuousActionsOut[1]} [2]={continuousActionsOut[2]} [3]={continuousActionsOut[3]}");
     }
 
-
     // void OnCollisionEnter(Collision coll)
     // {
 
@@ -215,7 +210,7 @@ public class Rocket2 : Agent
         if(other.tag=="Target")
         {
             Debug.Log("TARGET REACHED!!!!!!!!");
-            AddReward(+1.0f);
+            SetReward(+1.0f);
             EndEpisode();
         }
     }
