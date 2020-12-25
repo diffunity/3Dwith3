@@ -15,10 +15,6 @@ public class Rocket2 : Agent
     public Renderer floorRd;
     public Collider launchPad;
 
-    // private Material originMt;
-    // public Material badMt;
-    // public Material goodMt;
-
     private float timer = 0.0f;
     private float waitTime = 10.0f;
 
@@ -34,6 +30,11 @@ public class Rocket2 : Agent
     // Start is called before the first frame update
     void Start(){}
 
+    // Update is called once per frame
+    void Update(){}
+
+    private void FixedUpdate(){}
+
     public override void Initialize()
     {
         tr = GetComponent<Transform>();
@@ -43,7 +44,7 @@ public class Rocket2 : Agent
 
     public override void OnEpisodeBegin()
     {
-        // the beginning setting of each episodes
+        // the initial setting of each episodes
         var capsuleCollider = targetCollider.GetComponent("CapsuleCollider") as CapsuleCollider;
 
         // Curriculum Phase 1
@@ -55,8 +56,8 @@ public class Rocket2 : Agent
         // capsuleCollider.height = 70;
 
         // Curriculum Phase 3
-        capsuleCollider.radius = 50;
-        capsuleCollider.height = 50;
+        // capsuleCollider.radius = 50;
+        // capsuleCollider.height = 50;
 
         // Curriculum Phase 3
         // capsuleCollider.radius = 40;
@@ -79,10 +80,6 @@ public class Rocket2 : Agent
         float targetX = 418.5815f + Random.Range(-200.0f, 200.0f);
         float targetZ = -58.23349f + Random.Range(-200.0f, 200.0f);
         float targetY = 500f + Random.Range(0.0f, 20.0f);
-
-        // float targetX = 10.02007f;
-        // float targetY = 476.0389f;
-        // float targetZ = 629.3224f;
 
         targetTr.localPosition = new Vector3(targetX,
                                              targetY,
@@ -157,8 +154,6 @@ public class Rocket2 : Agent
 
         rb.AddRelativeTorque(torque.normalized);
 
-        // rb.AddRelativeForce(thrust.normalized);
-
         // rb.AddRelativeTorque(velX*0.1f,
         //                      0.0f,
         //                      velZ*0.1f);
@@ -215,8 +210,4 @@ public class Rocket2 : Agent
         }
     }
 
-    private void FixedUpdate(){}
-
-    // Update is called once per frame
-    void Update(){}
 }
